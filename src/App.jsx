@@ -3,6 +3,7 @@ import { useState } from "react";
 function App() {
   const [task, setTask] = useState("");
   const [taskList, setTaskList] = useState([]);
+  const [strike, setStrike] = useState(taskList.map(() => false));
 
   const handleAdd = () => {
     setTaskList(() => {
@@ -12,11 +13,25 @@ function App() {
     });
   };
 
+  const handleStrike = (index) => {
+    setStrike(prev => {
+      const uniqueStrike = [...prev];
+      uniqueStrike[index] = true;
+      return uniqueStrike
+    })
+  }
+
   const handleDelete = (index) => {
     const newList = taskList.filter((v, i) => {
       return index != i;
     });
     setTaskList(newList);
+
+    setStrike(prev => {
+      const uniqueStrike = [...prev];
+      uniqueStrike[index] = false;
+      return uniqueStrike;
+    })
   };
 
   return (
@@ -46,54 +61,54 @@ function App() {
             {taskList.length > 0 &&
               taskList.map((item, index) => {
                 return (
-                  <div className="flex justify-between h-9 rounded-full px-2 my-3 bg-slate-50 text-black">
-                    <div className="grow flex gap-2 items-center">
-                      <input
-                        type="checkbox"
-                        id={ item }
-                        className="peer/check hidden"
-                      />
-                      <label htmlFor={ item }>
+                  <div key={index} className="flex items-center justify-between h-9 rounded-full px-2 pl-4 my-3 bg-slate-50 text-black">
+                    <div className={`font-semibold ${strike[index] ? "line-through" : ""}`}>
+                      {item}
+                    </div>
+                    <div className="flex gap-3">
+                      {/* done button */}
+                      {strike[index] ? <></> : <>
+                        <button onClick={() => handleStrike(index)}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="green"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </button>
+                      </>}
+
+
+
+                      {/* delete button */}
+                      <button
+                        onClick={() => handleDelete(index)}
+                        className=" relative text-center"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="green"
+                          strokeWidth="1.5"
+                          stroke="crimson"
                           className="w-6 h-6"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                      </label>
-
-                      <div className="peer-checked/check:line-through font-semibold">
-                        { item }
-                      </div>
+                      </button>
                     </div>
-
-                    <button
-                      onClick={ () => handleDelete(index) }
-                      className=" relative text-center"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="crimson"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </button>
                   </div>
                 )
               })}
